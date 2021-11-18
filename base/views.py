@@ -1,0 +1,82 @@
+from django.shortcuts import render, redirect
+from django.db.models import Q
+from .models import Room, Topic
+from .forms import RoomForm
+
+# Create your views here.
+
+def home(request):
+    if request.GET.get('q') != None:
+        q = request.GET.get('q')
+    else:
+        q = ''
+    rooms = Room.objects.filter(
+        Q(topic__name__icontains=q) |
+        Q(name__icontains=q)
+    )
+    # rooms = Room.objects.filter(topic__name__contains=q)
+    # rooms = Room.objects.filter(topic__name__startswith=q)
+    topics = Topic.objects.all()
+    roomCnt = rooms.count()
+    
+    context = {
+        'rooms': rooms,
+        'topics': topics,
+        'roomCnt': roomCnt,
+    }
+    
+    # implicit directory basename is base/templates/ in default in Django
+    return render(request, 'base/home.html', context) 
+
+def room(request, roomID):
+    rooms = Room.objects.get(id=roomID)
+    
+    context = {
+        'rooms': rooms,
+    }
+    
+    return render(request, 'base/room.html', context)
+
+def createRoom(request):
+    form = RoomForm()
+    
+    # for post request
+    if (request.method == 'POST'):
+        form = RoomForm(request.POST)
+        if (form.is_valid()):
+            form.save()
+            return redirect('home')
+    
+    context = {
+        'form': form,
+    }
+    
+    return render(request, 'base/room_form.html', context)
+
+def updateRoom(request, roomID):
+    room = Room.objects.get(id=roomID)
+    form = RoomForm(instance=room) # prefill form with room
+    
+    if (request.method == 'POST'):
+        form = RoomForm(request.POST, instance=room) # POST data will replace room data
+        if (form.is_valid()):
+            form.save()
+            return redirect('home')
+        
+    context = {
+        'form': form,
+    }
+    
+    return render(request, 'base/room_form.html', context)
+
+def deleteRoom(request, roomID):
+    room = Room.objects.get(id=roomID)
+    if (request.method == 'POST'):
+        room.delete()
+        return redirect('home')
+
+    context = {
+        'obj': room,
+    }
+    
+    return render(request, 'base/delete.html', context)

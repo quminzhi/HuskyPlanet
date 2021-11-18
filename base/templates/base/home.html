@@ -1,0 +1,42 @@
+{% extends 'main.html' %}
+{% comment %} look for in BASE_DIR / templates {% endcomment %}
+
+{% block content %}
+    <style>
+        .home-container {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+        }
+    </style>
+
+    <div class='home-container'>
+        <div class='sidebar'>
+            <h3> Browse Topics </h3>
+            <hr>
+            <div>
+                <a href="{% url 'home' %}"> All </a>
+            </div>
+            {% for topic in topics %}
+            <div>
+                <a href="{% url 'home' %}?q={{ topic.name }}"> {{ topic.name }}</a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class='content'>
+            <h1> Hello World </h1>
+            <h5> {{ roomCnt }} rooms available </h5>
+            <a href="{% url 'create-room' %}"> register room </a>
+            <hr>
+        
+            {% for room in rooms %}
+                <a href="{% url 'update-room' room.id %}"> edit </a>
+                <a href="{% url 'delete-room' room.id %}"> delete </a>
+                <h3> Host: @{{ room.host }} </h3>
+                <h3> room {{ room.id }}: <a href="{% url 'room' room.id %}"> {{ room.name }} </a></h3>
+                <small> {{ room.topic}} </small>
+                <hr>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
