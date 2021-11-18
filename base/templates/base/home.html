@@ -28,7 +28,7 @@
             <h5> {{ roomCnt }} rooms available </h5>
             <a href="{% url 'create-room' %}"> register room </a>
             <hr>
-        
+            
             {% for room in rooms %}
                 <a href="{% url 'update-room' room.id %}"> edit </a>
                 <a href="{% url 'delete-room' room.id %}"> delete </a>
