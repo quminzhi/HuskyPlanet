@@ -1,4 +1,5 @@
 from django.contrib import auth
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
@@ -6,7 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from .models import Room, Topic
+from .models import Room, Topic, Message
 from .forms import RoomForm
 
 # Create your views here.
@@ -89,12 +90,25 @@ def home(request):
     return render(request, 'base/home.html', context) 
 
 def room(request, roomID):
-    rooms = Room.objects.get(id=roomID)
+    room = Room.objects.get(id=roomID)
+    room_messages = Message.objects.filter(room__name=room).order_by('-created')
+    participants = room.participants.all()
+
+    if (request.method == 'POST'):
+        message = Message.objects.create(
+            user=request.user,
+            room=room,
+            body=request.POST.get('body')
+        )
+        room.participants.add(request.user)
+        return redirect('room', roomID=room.id)
     
     context = {
-        'rooms': rooms,
+        'room': room,
+        'room_messages': room_messages,
+        'participants': participants,
     }
-    
+
     return render(request, 'base/room.html', context)
 
 @login_required(login_url='login')
@@ -140,6 +154,23 @@ def deleteRoom(request, roomID):
 
     context = {
         'obj': room,
+    }
+    
+    return render(request, 'base/delete.html', context)
+
+@login_required(login_url='login')
+def deleteMessage(request, msgID):
+    message = Message.objects.get(id=msgID)
+    
+    if (request.user != message.user):
+        return HttpResponse('No permission')
+    
+    if (request.method == 'POST'):
+        message.delete()
+        return redirect('home')
+
+    context = {
+        'obj': message,
     }
     
     return render(request, 'base/delete.html', context)
