@@ -72,18 +72,22 @@ def home(request):
     else:
         q = ''
     rooms = Room.objects.filter(
-        Q(topic__name__icontains=q) |
+        Q(topic__name__icontains=q) | # bit operation
         Q(name__icontains=q)
     )
     # rooms = Room.objects.filter(topic__name__contains=q)
     # rooms = Room.objects.filter(topic__name__startswith=q)
     topics = Topic.objects.all()
     roomCnt = rooms.count()
-    
+    room_messages = Message.objects.all().filter(
+        Q(room__topic__name__icontains=q)
+    )
+
     context = {
         'rooms': rooms,
         'topics': topics,
         'roomCnt': roomCnt,
+        'room_messages': room_messages,
     }
     
     # implicit directory basename is base/templates/ in default in Django
@@ -91,7 +95,7 @@ def home(request):
 
 def room(request, roomID):
     room = Room.objects.get(id=roomID)
-    room_messages = Message.objects.filter(room__name=room).order_by('-created')
+    room_messages = Message.objects.filter(room__name=room)
     participants = room.participants.all()
 
     if (request.method == 'POST'):
@@ -102,7 +106,7 @@ def room(request, roomID):
         )
         room.participants.add(request.user)
         return redirect('room', roomID=room.id)
-    
+
     context = {
         'room': room,
         'room_messages': room_messages,
@@ -110,6 +114,22 @@ def room(request, roomID):
     }
 
     return render(request, 'base/room.html', context)
+
+def userProfile(request, username):
+    user = User.objects.get(username=username)
+    rooms = Room.objects.filter(host=user.id)
+    room_messages = Message.objects.filter(user=user.id)
+    topics = Topic.objects.all()
+    
+    context = {
+        'user': user,
+        'rooms': rooms,
+        'room_messages': room_messages,
+        'topics': topics,
+    }
+    
+    return render(request, 'base/profile.html', context)
+
 
 @login_required(login_url='login')
 def createRoom(request):
@@ -119,7 +139,9 @@ def createRoom(request):
     if (request.method == 'POST'):
         form = RoomForm(request.POST)
         if (form.is_valid()):
-            form.save()
+            room = form.save(commit=False) # stop commit and customize
+            room.host = request.user # set host to be request user
+            room.save()
             return redirect('home')
     
     context = {
