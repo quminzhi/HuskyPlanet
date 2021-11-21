@@ -1,9 +1,9 @@
 {% for room in rooms %}
 <div class="roomListRoom">
     <div class="roomListRoom__header">
-        <a href="{% url 'profile' room.host %}" class="roomListRoom__author">
+        <a href="{% url 'profile' room.host.name %}" class="roomListRoom__author">
             <div class="avatar avatar--small">
-                <img src="https://randomuser.me/api/portraits/women/11.jpg" />
+                <img src="{{ room.host.avatar.url }}" />
             </div>
             <span>@{{ room.host.username }}</span>
         </a>

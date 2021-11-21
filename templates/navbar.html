@@ -2,8 +2,8 @@
 <header class="header header--loggedIn">
     <div class="container">
         <a href="{% url 'home' %}" class="header__logo">
-            <img src="{% static 'assets/logo.svg' %}" />
-            <h1>StudyBuddy</h1>
+            <img src="{% static 'images/W-Logo_RegistrationMark_Tan_7504.png' %}" />
+            <h1>Husky Planet</h1>
         </a>
         <form class="header__search" method="GET" action="{% url 'home' %}">
             <label>
@@ -22,7 +22,7 @@
             <div class="header__user">
                 <a href="{% url 'profile' user.username %}">
                     <div class="avatar avatar--medium active">
-                        <img src="https://randomuser.me/api/portraits/men/37.jpg" />
+                        <img src="{{request.user.avatar.url}}" />
                     </div>
                     <p>{{ request.user.username }} <span>@{{ request.user.username }}</span></p>
                 </a>
@@ -36,7 +36,7 @@
             {% else %}
             <!-- Not Logged In -->
             <a href="{% url 'login' %}">
-                <img src="{% static 'assets/avatar.svg' %}" />
+                <img src="{% static 'images/avatar.svg' %}" />
                 <p>Login</p>
             </a>
             {% endif %}
