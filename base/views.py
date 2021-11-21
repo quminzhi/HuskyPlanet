@@ -79,6 +79,7 @@ def home(request):
     # rooms = Room.objects.filter(topic__name__contains=q)
     # rooms = Room.objects.filter(topic__name__startswith=q)
     topics = Topic.objects.all()
+    topics_display = topics[0:5]
     roomCnt = rooms.count()
     room_messages = Message.objects.all().filter(
         Q(room__topic__name__icontains=q)
@@ -87,6 +88,7 @@ def home(request):
     context = {
         'rooms': rooms,
         'topics': topics,
+        'topics_display': topics_display,
         'roomCnt': roomCnt,
         'room_messages': room_messages,
     }
@@ -121,12 +123,14 @@ def userProfile(request, username):
     rooms = Room.objects.filter(host=user.id)
     room_messages = Message.objects.filter(user=user.id)
     topics = Topic.objects.all()
+    topics_display = topics[0:5]
     
     context = {
         'user': user,
         'rooms': rooms,
         'room_messages': room_messages,
         'topics': topics,
+        'topics_display': topics_display,
     }
     
     return render(request, 'base/profile.html', context)
@@ -230,4 +234,26 @@ def updateUser(request):
         'form': form,
     }
     
-    return render(request, 'base/update-user.html', context)
+    return render(request, 'base/update_user.html', context)
+
+def topicView(request):
+    if request.GET.get('q') != None:
+        q = request.GET.get('q')
+        topics = Topic.objects.filter(name__icontains=q)
+    else:
+        topics = Topic.objects.all()
+    
+    context = {
+        'topics': topics,
+    }
+    
+    return render(request, 'base/topics.html', context)
+
+def activityView(request):
+    room_messages = Message.objects.all()
+    
+    context = {
+        'room_messages': room_messages,
+    }
+    
+    return render(request, 'base/activity.html', context)
