@@ -2,18 +2,20 @@
 {% load static %}
 
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta author="Minzhi Qu" email="quminzhi@gmail.com">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" type="image/x-icon" />
     <link rel="stylesheet" href="{% static 'css/style.css' %}" />
-    <title>Husky Planet - UW Zone </title>
-  </head>
 
-  <body>
-    
+    <title>Husky Planet - UW Zone </title>
+</head>
+
+<body>
+
     {% include 'navbar.html' %}
 
     {% if messages %}
@@ -29,5 +31,6 @@
     {% endblock %}
 
     <script src="{% static 'js/script.js' %}"></script>
-  </body>
+</body>
+
 </html>
