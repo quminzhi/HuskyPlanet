@@ -11,7 +11,9 @@ class User(AbstractUser):
     
     avatar = models.ImageField(null=True, default="avatar.svg")
     
+    # when creating superuser, comment out following code
     USERNAME_FIELD = 'email'
+    
     REQUIRED_FIELDS = []
 
 
