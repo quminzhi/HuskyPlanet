@@ -96,7 +96,7 @@ We are able to connect RDS with python database adapter `psycopg2`.
 
 ## Online Demo
 
-You are able to play with it on our [demo server](3.14.10.181:8080).
+You are able to play with it on our [demo server](http://3.14.10.181:8080).
 
 Developer: Minzhi Qu, Yanliu Wang
 Email: quminzhi@gmail.com
