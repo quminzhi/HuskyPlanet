@@ -6,9 +6,15 @@
     <div class="activities__box">
         <div class="activities__boxHeader roomListRoom__header">
             <a href="{% url 'profile' message.user.username %}" class="roomListRoom__author">
+                {% if message.user.status == 1 %}
+                <div class="avatar avatar--small active">
+                    <img src="{{ message.user.avatar.url }}" />
+                </div>
+                {% else %}
                 <div class="avatar avatar--small">
                     <img src="{{ message.user.avatar.url }}" />
                 </div>
+                {% endif %}
                 <p>
                     @{{ message.user.username }}
                     <span>{{ message.created | timesince }} ago</span>

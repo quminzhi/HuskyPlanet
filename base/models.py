@@ -8,6 +8,7 @@ class User(AbstractUser):
     name = models.CharField(max_length=200, null=True)
     email = models.EmailField(null=True, unique=True)
     bio = models.TextField(null=True)
+    status = models.IntegerField(null=False, default=0)
     
     avatar = models.ImageField(null=True, default="avatar.svg")
     

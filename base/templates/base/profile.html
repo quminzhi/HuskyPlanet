@@ -13,9 +13,15 @@
       <div class="roomList">
         <div class="profile">
           <div class="profile__avatar">
-            <div class="avatar avatar--large active">
-              <img src="{{ user.avatar.url }}" />
+            {% if user.status == 1 %}
+            <div class="avatar avatar--small active">
+                <img src="{{ user.avatar.url }}" />
             </div>
+            {% else %}
+            <div class="avatar avatar--small">
+                <img src="{{ user.avatar.url }}" />
+            </div>
+            {% endif %}
           </div>
           <div class="profile__info">
             <h3>{{ user.username }}</h3>

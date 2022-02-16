@@ -76,9 +76,15 @@
           <div class="room__hosted">
             <p>Hosted By</p>
             <a href="{% url 'profile' room.host.username %}" class="room__author">
-              <div class="avatar avatar--small">
-                <img src="{{ room.host.avatar.url }}" />
+              {% if room.host.status == 1 %}
+              <div class="avatar avatar--small active">
+                  <img src="{{ room.host.avatar.url }}" />
               </div>
+              {% else %}
+              <div class="avatar avatar--small">
+                  <img src="{{ room.host.avatar.url }}" />
+              </div>
+              {% endif %}
               <span>@{{ room.host.username }}</span>
             </a>
           </div>
@@ -94,9 +100,15 @@
               <div class="thread__top">
                 <div class="thread__author">
                   <a href="{% url 'profile' message.user.username %}" class="thread__authorInfo">
-                    <div class="avatar avatar--small">
-                      <img src="{{ message.user.avatar.url }}" />
+                    {% if message.user.status == 1 %}
+                    <div class="avatar avatar--small active">
+                        <img src="{{ message.user.avatar.url }}" />
                     </div>
+                    {% else %}
+                    <div class="avatar avatar--small">
+                        <img src="{{ message.user.avatar.url }}" />
+                    </div>
+                    {% endif %}
                     <span>@{{ message.user.username }}</span>
                   </a>
                   <span class="thread__date">{{ message.created | timesince }} ago</span>
@@ -139,9 +151,15 @@
       <div class="participants__list scroll">
         {% for user in participants %}
         <a href="{% url 'profile' user.username %}" class="participant">
-          <div class="avatar avatar--medium">
-            <img src="{{ user.avatar.url }}" />
+          {% if user.status == 1 %}
+          <div class="avatar avatar--small active">
+              <img src="{{ user.avatar.url }}" />
           </div>
+          {% else %}
+          <div class="avatar avatar--small">
+              <img src="{{ user.avatar.url }}" />
+          </div>
+          {% endif %}
           <p>
             {{ user.username }}
             <span>@{{ user.username }}</span>

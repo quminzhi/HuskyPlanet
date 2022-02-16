@@ -21,9 +21,15 @@
             {% if request.user.is_authenticated %}
             <div class="header__user">
                 <a href="{% url 'profile' user.username %}">
-                    <div class="avatar avatar--medium active">
-                        <img src="{{request.user.avatar.url}}" />
+                    {% if request.user.status == 1 %}
+                    <div class="avatar avatar--small active">
+                        <img src="{{ request.user.avatar.url }}" />
                     </div>
+                    {% else %}
+                    <div class="avatar avatar--small">
+                        <img src="{{ request.user.avatar.url }}" />
+                    </div>
+                    {% endif %}
                     <p>{{ request.user.username }} <span>@{{ request.user.username }}</span></p>
                 </a>
                 <button class="dropdown-button">

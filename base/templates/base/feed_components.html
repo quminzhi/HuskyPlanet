@@ -2,9 +2,15 @@
 <div class="roomListRoom">
     <div class="roomListRoom__header">
         <a href="{% url 'profile' room.host.username %}" class="roomListRoom__author">
+            {% if room.host.status == 1 %}
+            <div class="avatar avatar--small active">
+                <img src="{{ room.host.avatar.url }}" />
+            </div>
+            {% else %}
             <div class="avatar avatar--small">
                 <img src="{{ room.host.avatar.url }}" />
             </div>
+            {% endif %}
             <span>@{{ room.host.username }}</span>
         </a>
         <div class="roomListRoom__actions">
