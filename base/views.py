@@ -8,6 +8,13 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from .models import Room, Topic, Message, User
 from .forms import RoomForm, UserForm, MyUserCreationForm
+from .utils import account_activation_token
+
+from django.contrib.sites.shortcuts import get_current_site
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.core.mail import EmailMessage
 
 # Create your views here.
 
@@ -48,15 +55,47 @@ def registerView(request):
     form = MyUserCreationForm()
     
     if (request.method == 'POST'):
+        # delete inactivated user
+        email = request.POST.get('email')
+        try:
+            user = User.objects.get(email=email)
+        except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+        if (user is not None) and (user.is_active == False):
+            user.delete()
+        
         form = MyUserCreationForm(request.POST)
         if (form.is_valid()):
             user = form.save(commit=False)
+            
+            # require for using uw email to signup
+            if (not user.email.endswith('uw.edu')):
+                messages.info(request, 'Please signup with UW email.')
+                return redirect('register')
+            
             user.username = user.username.lower()
+            user.is_active = False  # wait for email confirmation
             user.save()
-            login(request, user)
-            return redirect('home')
+            
+            current_site = get_current_site(request)
+            subject = 'Activate Your Account @HuskyPlanet'
+            message = render_to_string(
+                'base/activation/email.html', {
+                    'user': user,
+                    'domain': current_site.domain,
+                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                    'token': account_activation_token.make_token(user),
+                }
+            )
+            to_email = form.cleaned_data.get('email')
+            email = EmailMessage(subject, message, to=[to_email])
+            email.send()
+            # messages.info(request, 'User account was created but is waiting for activation.')
+            return render(request, 'base/activation/activate.html')
+            
         else:
             messages.error(request, 'An error occurred during registration')
+            return redirect('register')
             
     context = {
         'page': page,
@@ -64,6 +103,24 @@ def registerView(request):
     }
     
     return render(request, 'base/login_register.html', context)
+
+def activateView(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.first_name = user.username
+        user.save()
+        login(request, user)
+        messages.success(request, 'Welcome back ' + user.username + '!')
+        return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
+    else:
+        messages.error(request, 'Sorry, we cannot verify your email')
+        return HttpResponse('Activation link is invalid!')
+
 
 def home(request):
     if request.GET.get('q') != None:
