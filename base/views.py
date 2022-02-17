@@ -138,7 +138,7 @@ def home(request):
     roomCnt = rooms.count()
     room_messages = Message.objects.all().filter(
         Q(room__topic__name__icontains=q)
-    )
+    )[:5]
 
     context = {
         'rooms': rooms,
@@ -153,7 +153,7 @@ def home(request):
 
 def room(request, roomID):
     room = Room.objects.get(id=roomID)
-    room_messages = Message.objects.filter(room__name=room)
+    room_messages = Message.objects.filter(room__name=room)[:5]
     participants = room.participants.all()
 
     if (request.method == 'POST'):
@@ -176,7 +176,7 @@ def room(request, roomID):
 def userProfile(request, username):
     user = User.objects.get(username=username)
     rooms = Room.objects.filter(host=user.id)
-    room_messages = Message.objects.filter(user=user.id)
+    room_messages = Message.objects.filter(user=user.id)[:5]
     topics = Topic.objects.all()
     topics_display = topics[0:5]
     
@@ -305,7 +305,7 @@ def topicView(request):
     return render(request, 'base/topics.html', context)
 
 def activityView(request):
-    room_messages = Message.objects.all()
+    room_messages = Message.objects.all()[:5]
     
     context = {
         'room_messages': room_messages,

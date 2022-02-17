@@ -53,7 +53,7 @@
                 <div class="activities__boxContent">
                     <p>replied to post “<a href="{% url 'room' message.room.id %}">{{ message.room }}</a>”</p>
                     <div class="activities__boxRoomContent">
-                        {{ message.body }}
+                        {{ message.body | slice:'20' }}
                     </div>
                 </div>
             </div>
